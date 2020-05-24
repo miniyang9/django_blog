@@ -14,6 +14,7 @@ class BaseOwnerAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         obj.owner = request.user
+        print(obj.category)
         return super(BaseOwnerAdmin, self).save_model(request, obj, form, change)
 
 

@@ -87,7 +87,7 @@ class PostAdmin(BaseOwnerAdmin):
             'fields': ('tag', ),
         }),
     )
-    # filter_vertical = ('tag', )
+    filter_vertical = ('tag', )
 
     def operator(self, obj):
         return format_html('<a href="{}">编辑</a>', reverse('cus_admin:blog_post_change', args=(obj.id, )))
