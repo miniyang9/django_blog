@@ -18,20 +18,24 @@ from django.urls import path
 
 
 # from blog.views import post_list, post_detail
-from blog.views import (IndexView, CategoryView, TagView,
-                          PostDetailView, )
-from config.views import links
+from blog.views import (IndexView, AuthorView, CategoryView, TagView,
+                          PostDetailView, SearchView)
 from .custom_site import custom_site
+from config.views import LinkListView
+from comment.views import CommentView
 
 urlpatterns = [
     path('', IndexView.as_view(), name="homepage"),
+    path('author/<int:owner_id>', AuthorView.as_view(), name='author'),
     path('category/<int:category_id>', CategoryView.as_view(), name='category-list'),
     path('tag/<int:tag_id>', TagView.as_view(), name='tag-list'),
     # 对应view中post_detail函数方法
     # path('post/<int:post_id>.html', post_detail, name='post-detail'),
     # 对应于view中PostDetail类方法
     path('post/<int:post_id>.html', PostDetailView.as_view(), name='post-detail'),
-    path('links', links, name='links'),
+    path('search/', SearchView.as_view(), name='search'),
+    path('links', LinkListView.as_view(), name='links'),
     path('super_admin/', admin.site.urls, name='super-admin'),
     path('admin/', custom_site.urls, name='admin'),
+    path('comment/', CommentView.as_view(), name="comment"),
 ]

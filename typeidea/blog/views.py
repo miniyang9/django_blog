@@ -1,3 +1,6 @@
+# from comment.forms import CommentForm
+# from comment.models import Comment
+from django.db.models import Q
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from .models import Post, Tag, Category
@@ -83,10 +86,20 @@ class TagView(IndexView):
 
 
 class PostDetailView(CommonViewMixin, DetailView):
-    model = Post
+    queryset = Post.latest_post()
+
     template_name = 'blog/detail.html'
     context_object_name = 'post'
     pk_url_kwarg = 'post_id'
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context.update({
+    #         'comment_form': CommentForm,
+    #         'comment_list': Comment.get_by_target(self.request.path),
+    #     })
+    #
+    #     return context
 
 
 # def post_detail(request, post_id):
@@ -100,4 +113,29 @@ class PostDetailView(CommonViewMixin, DetailView):
 #     }
 #     context.update(Category.get_navs())
 #     return render(request, 'blog/detail.html', context=context)
+
+class SearchView(IndexView):
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'keyword': self.request.GET.get('keyword', ''),
+        })
+
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        keyword = self.request.GET.get('keyword')
+        if not keyword:
+            return queryset
+        return queryset.filter(Q(title__icontains=keyword)
+                               | Q(desc__icontains=keyword))
+
+
+class AuthorView(IndexView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        author_id = self.kwargs.get('owner_id')
+        return queryset.filter(owner_id=author_id)
+
 
