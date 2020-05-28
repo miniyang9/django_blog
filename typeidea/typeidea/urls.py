@@ -22,6 +22,7 @@ from blog.views import (IndexView, AuthorView, CategoryView, TagView,
                           PostDetailView, SearchView)
 from .custom_site import custom_site
 from config.views import LinkListView
+from comment.views import CommentView
 
 urlpatterns = [
     path('', IndexView.as_view(), name="homepage"),
@@ -36,4 +37,5 @@ urlpatterns = [
     path('links', LinkListView.as_view(), name='links'),
     path('super_admin/', admin.site.urls, name='super-admin'),
     path('admin/', custom_site.urls, name='admin'),
+    path('comment/', CommentView.as_view(), name="comment"),
 ]
