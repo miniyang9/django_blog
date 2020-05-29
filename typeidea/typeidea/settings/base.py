@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'config',
     'comment',
     'typeidea',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -128,3 +129,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'themes', THEME, "static"),
 ]
+
+# 新版drf schema_class默认用的是rest_framework.schemas.openapi.AutoSchema
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2,
+}
