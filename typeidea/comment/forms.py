@@ -1,7 +1,7 @@
 from django import forms
 
 from .models import Comment
-
+import mistune
 
 class CommentForm(forms.ModelForm):
     nickname = forms.CharField(
@@ -37,6 +37,7 @@ class CommentForm(forms.ModelForm):
         content = self.cleaned_data.get('content')
         if len(content) < 15:
             raise forms.ValidationError('最少15字评论...')
+        content = mistune.markdown(content)
         return content
 
     class Meta:

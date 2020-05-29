@@ -83,20 +83,19 @@ class SideBar(models.Model):
             }
             result = render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_COMMENT:
-            # TODO
-            # comments = Comment.objects.filter(status=Comment.STATUS_NORMAL)
-            # search_list = {}
-            # if comments:
-            #     for item in comments:
-            #         search_list[item] = item.target.split("/")[-1].split(".")[0]
-            #     print(search_list)
-            #     posts = Post.objects.in_bulk(search_list)
-            #     post_dict = {}
-            #     for num, post in posts.items():
-            #         post_dict[title] = search_list[str(num)]
-
+            comments = Comment.objects.filter(status=Comment.STATUS_NORMAL)
+            search_list = []
+            post_dict = {}
+            if comments:
+                for item in comments:
+                    search_list.append(item.target.split("/")[-1].split(".")[0])
+                posts = Post.objects.in_bulk(search_list)
+                for num, item in enumerate(search_list):
+                    post_dict[comments[num]] = posts[int(search_list[num])].title
             context = {
                 "comments": Comment.objects.filter(status=Comment.STATUS_NORMAL),
+                "posts": post_dict,
             }
             result = render_to_string('config/blocks/sidebar_comments.html', context)
+
         return result

@@ -1,6 +1,8 @@
 # from comment.forms import CommentForm
 # from comment.models import Comment
-from django.db.models import Q
+from datetime import date
+from django.core.cache import cache
+from django.db.models import Q, F
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from .models import Post, Tag, Category
@@ -91,6 +93,33 @@ class PostDetailView(CommonViewMixin, DetailView):
     template_name = 'blog/detail.html'
     context_object_name = 'post'
     pk_url_kwarg = 'post_id'
+
+    def get(self, request, *args, **kwargs):
+        response = super().get(request, *args, **kwargs)
+        self.handle_visited()
+        return response
+
+    def handle_visited(self):
+        increase_pv = False
+        increase_uv = False
+        uid = self.request.uid
+        pv_key = f"pv:{uid}:{self.request.path}"
+        uv_key = f"uv:{uid}:{str(date.today())}:{self.request.path}"
+        if not cache.get(pv_key):
+            increase_pv = True
+            cache.get(pv_key, 1, 1 * 60)    # 1min有效
+
+        if not cache.get(uv_key):
+            increase_uv = True
+            cache.get(uv_key, 1, 24 * 60 * 60)  # 24hour有效
+
+        if increase_pv and increase_uv:
+            Post.objects.filter(pk=self.objects.id).update(pv=F('pv') + 1,
+                                                           uv=F('uv') + 1)
+        elif increase_pv:
+            Post.objects.filter(pk=self.objects.id).update(pv=F('pv') + 1)
+        elif increase_uv:
+            Post.objects.filter(pk=self.objects.id).update(uv=F('pv') + 1)
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)

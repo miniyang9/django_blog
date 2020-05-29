@@ -14,15 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.sitemaps import views as sitemap_views
 from django.urls import path
 
 
 # from blog.views import post_list, post_detail
 from blog.views import (IndexView, AuthorView, CategoryView, TagView,
                           PostDetailView, SearchView)
+from blog.rss import LatestPostFeed
+from blog.sitemap import PostSitemap
 from .custom_site import custom_site
 from config.views import LinkListView
 from comment.views import CommentView
+
 
 urlpatterns = [
     path('', IndexView.as_view(), name="homepage"),
@@ -38,4 +42,6 @@ urlpatterns = [
     path('super_admin/', admin.site.urls, name='super-admin'),
     path('admin/', custom_site.urls, name='admin'),
     path('comment/', CommentView.as_view(), name="comment"),
+    path('rss|feed/', LatestPostFeed(), name="rss"),
+    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
 ]
