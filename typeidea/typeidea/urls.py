@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemap_views
 from django.urls import path, include
+from django.views.decorators.cache import cache_page
 
 # from blog.apis import post_list, PostList
 from blog.apis import PostViewSet, CategoryViewSet
@@ -53,7 +54,8 @@ urlpatterns = [
     path('admin/', custom_site.urls, name='admin'),
     path('comment/', CommentView.as_view(), name="comment"),
     path('rss|feed/', LatestPostFeed(), name="rss"),
-    path('sitemap.xml', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
+    path('sitemap.xml', cache_page(60*20, key_prefix='sitemap_cache_')(sitemap_views.sitemap),
+         {'sitemaps': {'posts': PostSitemap}}),
     # path('api/post/', post_list, name="post-list"),
     # path('api/post/', PostList.as_view(), name="post-list"),
     path('api/', include((router.urls, "blog"), namespace="api")),
